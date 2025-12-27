@@ -158,26 +158,9 @@ cd backend
 pytest
 ```
 
-## Roadmap
-
-- [ ] User authentication and personal study collections
-- [ ] Advanced filtering (publication date, journal, study type)
-- [ ] Citation export (BibTeX, RIS, APA)
-- [ ] Study comparison tool
-- [ ] Mobile application
-- [ ] Integration with reference managers (Zotero, Mendeley)
-- [ ] Community features (comments, ratings, discussions)
-
-## Contributing
-
-Contributions are welcome. Please feel free to submit issues for bugs or feature requests. For major changes, open an issue first to discuss the proposed changes.
-
 ## Acknowledgments
 
 - Research data sourced from PubMed via the NCBI E-utilities API
 - AI summaries powered by Anthropic's Claude
 - Inspired by the need for evidence-based fitness information
 
-## License
-
-MIT License - see LICENSE file for details
