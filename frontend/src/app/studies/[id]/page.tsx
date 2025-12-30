@@ -7,6 +7,18 @@ import { studiesApi, summariesApi } from '@/lib/api';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
+// Helper function to parse sections
+function parseSummary(text: string) {
+  const sections = text.split(/\n## /).filter(Boolean);
+  return sections.map(section => {
+    const [title, ...content] = section.split('\n');
+    return {
+      title: title.replace('## ', '').trim(),
+      content: content.join('\n').trim()
+    };
+  });
+}
+
 export default function StudyDetail() {
   const params = useParams();
   const studyId = parseInt(params.id as string);
@@ -90,40 +102,53 @@ export default function StudyDetail() {
               className="px-6 py-3 bg-purple-600 text-white rounded-lg flex items-center gap-2 hover:bg-purple-700 disabled:opacity-50"
             >
               <Sparkles className="w-5 h-5" />
-              {generateMutation.isLoading ? 'Generating...' : 'Generate AI Summary'}
+              {generateMutation.isLoading ? 'Generating...' : 'Generate In-Depth AI Analysis'}
             </button>
           </div>
           {showSummary && summary && (
             <div className="mt-6 p-6 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border border-purple-200">
               <div className="flex items-center gap-2 mb-4">
                 <Sparkles className="w-5 h-5 text-purple-600" />
-                <h2 className="text-xl font-bold text-gray-900">AI-Generated Summary</h2>
+                <h2 className="text-xl font-bold text-gray-900">In-Depth AI Analysis</h2>
               </div>
-              <div className="space-y-3">
-                {summary.summary_text.split('\n\n').map((paragraph, idx) => {
-                  if (paragraph.startsWith('## ')) {
-                    return (
-                      <h3 key={idx} className="text-lg font-bold text-gray-900 mt-4 mb-2">
-                        {paragraph.replace('## ', '')}
-                      </h3>
-                    );
-                  }
-                  const parts = paragraph.split(/(\*\*.*?\*\*)/g);
-                  return (
-                    <p key={idx} className="text-gray-800 leading-relaxed">
-                      {parts.map((part, i) => {
-                        if (part.startsWith('**') && part.endsWith('**')) {
+              <div className="space-y-4">
+                {parseSummary(summary.summary_text).map((section, idx) => (
+                  <details key={idx} className="group bg-white rounded-lg border border-purple-200 overflow-hidden" open={idx === 0}>
+                    <summary className="cursor-pointer px-4 py-3 font-semibold text-gray-900 hover:bg-purple-50 flex items-center justify-between">
+                      <span>{section.title}</span>
+                      <span className="text-purple-600 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div className="px-4 py-3 border-t border-purple-100">
+                      {section.content.split('\n\n').map((paragraph, pIdx) => {
+                        if (paragraph.startsWith('- ')) {
+                          const items = paragraph.split('\n- ').filter(Boolean);
                           return (
-                            <strong key={i} className="font-semibold text-gray-900">
-                              {part.slice(2, -2)}
-                            </strong>
+                            <ul key={pIdx} className="list-disc list-inside space-y-1 text-gray-800 mb-3">
+                              {items.map((item, iIdx) => (
+                                <li key={iIdx}>{item.replace('- ', '')}</li>
+                              ))}
+                            </ul>
                           );
                         }
-                        return <span key={i}>{part}</span>;
+                        const parts = paragraph.split(/(\*\*.*?\*\*)/g);
+                        return (
+                          <p key={pIdx} className="text-gray-800 leading-relaxed mb-3">
+                            {parts.map((part, i) => {
+                              if (part.startsWith('**') && part.endsWith('**')) {
+                                return (
+                                  <strong key={i} className="font-semibold text-gray-900">
+                                    {part.slice(2, -2)}
+                                  </strong>
+                                );
+                              }
+                              return <span key={i}>{part}</span>;
+                            })}
+                          </p>
+                        );
                       })}
-                    </p>
-                  );
-                })}
+                    </div>
+                  </details>
+                ))}
               </div>
               {summary.model_used && (
                 <p className="text-xs text-gray-500 mt-4 pt-4 border-t border-purple-200">
@@ -136,7 +161,7 @@ export default function StudyDetail() {
             <div className="mt-6 p-6 bg-purple-50 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600"></div>
-                <p>Generating AI summary...</p>
+                <p>Generating in-depth AI analysis...</p>
               </div>
             </div>
           )}
