@@ -27,6 +27,9 @@ app.add_middleware(
 app.include_router(studies.router, prefix="/api/studies", tags=["studies"])
 app.include_router(summaries.router, prefix="/api/summaries", tags=["summaries"])
 
+from app.api import claims
+app.include_router(claims.router, prefix="/api/claims", tags=["claims"])
+
 @app.get("/")
 def read_root():
     return {"message": "Hypertrophy Research Explorer API"}
