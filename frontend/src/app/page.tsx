@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import { studiesApi, Study } from '@/lib/api';
-import { Search, FileText, ExternalLink } from 'lucide-react';
+import { Search, FileText, ExternalLink, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
@@ -32,12 +32,23 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Hypertrophy Research Explorer
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Explore scientific studies on exercise, muscle growth, and strength training
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Hypertrophy Research Explorer
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Explore {data?.total || 232} scientific studies on exercise, muscle growth, and strength training
+              </p>
+            </div>
+            <Link 
+              href="/validate" 
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 shadow-lg flex items-center gap-2 transition-all"
+            >
+              <Shield className="w-5 h-5" />
+              Validate Claims
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -50,11 +61,14 @@ export default function Home() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search studies..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg"
+                placeholder="Search studies by title, keywords, authors..."
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-            <button type="submit" className="px-6 py-3 bg-blue-600 text-white rounded-lg">
+            <button 
+              type="submit" 
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Search
             </button>
           </div>
@@ -62,18 +76,18 @@ export default function Home() {
 
         {isLoading && (
           <div className="text-center py-12">
-            <p className="text-gray-600">Loading...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="text-gray-600 mt-4">Loading studies...</p>
           </div>
         )}
-
 
         {data && (
           <div>
             <div className="space-y-4">
               {data.studies.map((study) => (
-                <div key={study.id} className="bg-white rounded-lg shadow-sm border p-6">
+                <div key={study.id} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
                   <Link href={`/studies/${study.id}`}>
-                    <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600">
+                    <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
                       {study.title}
                     </h3>
                   </Link>
@@ -87,7 +101,11 @@ export default function Home() {
                     <p className="text-gray-700 mt-3 line-clamp-3">{study.abstract}</p>
                   )}
                   <div className="flex gap-3 mt-4">
-                    <Link href={`/studies/${study.id}`} className="text-blue-600 text-sm">
+                    <Link 
+                      href={`/studies/${study.id}`} 
+                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    >
+                      <FileText className="w-4 h-4" />
                       View Details
                     </Link>
                   </div>
@@ -100,15 +118,17 @@ export default function Home() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="px-4 py-2 border rounded-lg"
+                  className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
                   Previous
                 </button>
-                <span>Page {page} of {totalPages}</span>
+                <span className="text-gray-700">
+                  Page {page} of {totalPages}
+                </span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="px-4 py-2 border rounded-lg"
+                  className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
                   Next
                 </button>
